@@ -18,14 +18,14 @@ func main() {
 	sm := http.NewServeMux()
 	sm.Handle("/", hh)
 	sm.Handle("/goodbye", goodbye)
-	sm.Handle("/products", handlers.NewProducts(l))
+	sm.Handle("/products/*", handlers.NewProducts(l))
 
 	s := &http.Server{
 		Addr: ":8080",
 		Handler: sm,
 		IdleTimeout: 120 * time.Second,
-		ReadTimeout: 10 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		ReadTimeout: 1 * time.Second,
+		WriteTimeout: 1 * time.Second,
 	}
 
 	log.Fatal(s.ListenAndServe())

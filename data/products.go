@@ -28,8 +28,23 @@ func GetProducts() Products {
 	return productList
 }
 
+func getNextID() int {
+	lp := productList[len(productList)-1]
+	return lp.ID + 1
+}
+
+func AddProduct(p *Product) {
+	p.ID = getNextID()
+	productList = append(productList, p)
+}
+
 func (p *Product) ToJSON(products []*Product) (string, error) {
 	return "", nil
+}
+
+func (p *Product) FromJSON(r io.Reader) error {
+	d := json.NewDecoder(r)
+	return d.Decode(p)
 }
 
 var productList = []*Product{
