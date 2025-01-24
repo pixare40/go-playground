@@ -1,42 +1,18 @@
 package main
 
 import (
-	"context"
-	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"pixare40/hello/handlers"
-	"time"
+	"pixare40/hello/proto/currency"
+	"pixare40/hello/server"
+
+	"github.com/hashicorp/go-hclog"
+	"google.golang.org/grpc"
 )
 
 func main() {
-	l := log.New(os.Stdout, "hello: ", log.LstdFlags)
-	hh := handlers.NewHello(l)
-	goodbye := handlers.NewGoodbye(l)
+	logger := hclog.Default()
 
-	sm := http.NewServeMux()
-	sm.Handle("/", hh)
-	sm.Handle("/goodbye", goodbye)
-	sm.Handle("/products/*", handlers.NewProducts(l))
+	gs := grpc.NewServer()
 
-	s := &http.Server{
-		Addr: ":8080",
-		Handler: sm,
-		IdleTimeout: 120 * time.Second,
-		ReadTimeout: 1 * time.Second,
-		WriteTimeout: 1 * time.Second,
-	}
-
-	log.Fatal(s.ListenAndServe())
-
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt)
-
-	signal := <-sigChan
-	l.Println("Received terminate, graceful shutdown", signal)
-	tc, cancelFunc := context.WithTimeout(context.Background(), 30*time.Second)
-
-	defer cancelFunc()
-	s.Shutdown(tc)
+	// Register the service
+	currency.RegisterCurrencyServer(gs, server.NewCurrency(logger))
 }

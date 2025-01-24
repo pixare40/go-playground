@@ -1,0 +1,16 @@
+syntax="proto3";
+
+option go_package = "./currency";
+
+service Currency {
+    rpc GetCurrency (CurrencyRequest) returns (CurrencyResponse) {}
+}
+
+message CurrencyRequest {
+    string currency = 1;
+}
+
+message CurrencyResponse {
+    string currency = 1;
+    double rate = 2;
+}
